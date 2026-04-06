@@ -1,0 +1,14 @@
+{
+    "moduleFileExtensions": ["js", "json", "ts"],
+    "rootDir": ".",
+    "setupFilesAfterEnv": ["./integration/db/mysql/int-container.ts"],
+    "testEnvironment": "node",
+    "testRegex": ".int.spec.ts$",
+    "transform": {
+      "^.+\\.(t|j)s$": "ts-jest"
+    },
+    "moduleNameMapper": {
+      "^src/(.*)$": "<rootDir>/../src/$1"
+    }
+  }
+  
