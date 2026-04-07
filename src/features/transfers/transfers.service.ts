@@ -9,6 +9,7 @@ import { WalletRepository } from '../wallet/wallet.repository';
 import { WalletService } from '../wallet/wallet.service';
 import { InitiateTransferDto } from './dto/initiate-transfer.input';
 import { TransfersRepository } from './transfers.repository';
+import { UsersRepository } from '../users/repository/users.repository';
 
 @Injectable()
 export class TransfersService {
@@ -18,6 +19,7 @@ export class TransfersService {
     private readonly transfersRepository: TransfersRepository,
     private readonly walletRepository: WalletRepository,
     private readonly walletService: WalletService,
+    private readonly usersRepository: UsersRepository,
   ) {}
 
   async initiateTransfer(
@@ -61,6 +63,11 @@ export class TransfersService {
       throw new NotFoundException('Sender wallet not found');
     }
 
+    const [fromUserName, toUser] = await Promise.all([
+      this.getUserName(fromUserId),
+      this.usersRepository.findUserById(toWallet.user_id),
+    ]);
+
     const transfer = await this.transfersRepository.createTransfer({
       from_user_id: fromUserId,
       to_user_id: toWallet.user_id,
@@ -82,7 +89,10 @@ export class TransfersService {
           toUserId: toWallet.user_id,
           amount: input.amount,
           currency: input.currency,
-          userEmail: fromUserEmail,
+          fromUserEmail: fromUserEmail,
+          fromUserName: fromUserName ?? 'Unknown',
+          toUserEmail: toUser?.email,
+          toUserName: toUser?.name ?? 'Unknown',
         },
         occurred_at: new Date(),
         processed_at: null,
@@ -97,5 +107,10 @@ export class TransfersService {
         input.currency,
       ),
     ]);
+  }
+
+  private async getUserName(userId: string): Promise<string | undefined> {
+    const user = await this.usersRepository.findUserById(userId);
+    return user?.name;
   }
 }

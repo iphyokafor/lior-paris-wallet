@@ -4,6 +4,7 @@ import { TransfersService } from '../../../src/features/transfers/transfers.serv
 import { TransfersRepository } from '../../../src/features/transfers/transfers.repository';
 import { WalletRepository } from '../../../src/features/wallet/wallet.repository';
 import { WalletService } from '../../../src/features/wallet/wallet.service';
+import { UsersRepository } from '../../../src/features/users/repository/users.repository';
 import { SupportedCurrency } from '../../../src/shared/constants';
 
 const mockFromWallet = {
@@ -47,6 +48,10 @@ const mockWalletService = {
   invalidateBalanceCache: jest.fn(),
 };
 
+const mockUsersRepository = {
+  findUserById: jest.fn(),
+};
+
 describe('TransfersService', () => {
   let service: TransfersService;
 
@@ -57,6 +62,7 @@ describe('TransfersService', () => {
         { provide: TransfersRepository, useValue: mockTransfersRepository },
         { provide: WalletRepository, useValue: mockWalletRepository },
         { provide: WalletService, useValue: mockWalletService },
+        { provide: UsersRepository, useValue: mockUsersRepository },
       ],
     }).compile();
 
@@ -77,6 +83,13 @@ describe('TransfersService', () => {
     mockWalletRepository.findByUserIdAndCurrency.mockResolvedValue(
       mockFromWallet,
     );
+    mockUsersRepository.findUserById.mockImplementation((id: string) => {
+      if (id === 'user-sender')
+        return { name: 'Alice', email: 'sender@test.com' };
+      if (id === 'user-receiver')
+        return { name: 'Bob', email: 'receiver@test.com' };
+      return null;
+    });
     mockTransfersRepository.createTransfer.mockResolvedValue(mockTransfer);
     mockTransfersRepository.executeTransfer.mockResolvedValue(undefined);
 

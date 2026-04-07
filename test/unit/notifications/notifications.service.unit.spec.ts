@@ -34,18 +34,37 @@ describe('NotificationsService', () => {
     );
   });
 
-  it('logs a transfer notification', async () => {
+  it('logs a transfer sent notification', async () => {
     const logSpy = jest.spyOn(service['logger'], 'log');
 
-    await service.send('TransferCompleted', {
+    await service.send('TransferSent', {
       fromUserId: 'user-1',
       toUserId: 'user-2',
       amount: 3000,
       currency: 'EUR',
+      fromUserName: 'Alice',
+      toUserName: 'Bob',
     });
 
     expect(logSpy).toHaveBeenCalledWith(
-      expect.stringContaining('transfer of 3000 EUR'),
+      expect.stringContaining('transfer of 3000 EUR to Bob is complete'),
+    );
+  });
+
+  it('logs a transfer received notification', async () => {
+    const logSpy = jest.spyOn(service['logger'], 'log');
+
+    await service.send('TransferReceived', {
+      fromUserId: 'user-1',
+      toUserId: 'user-2',
+      amount: 3000,
+      currency: 'EUR',
+      fromUserName: 'Alice',
+      toUserName: 'Bob',
+    });
+
+    expect(logSpy).toHaveBeenCalledWith(
+      expect.stringContaining('received 3000 EUR from Alice'),
     );
   });
 

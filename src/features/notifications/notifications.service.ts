@@ -30,7 +30,7 @@ export class NotificationsService {
   ): Promise<void> {
     const message = this.buildMessage(eventName, payload);
     const subject = this.buildSubject(eventName);
-    const recipientEmail = payload.userEmail as string | undefined;
+    const recipientEmail = this.getRecipientEmail(eventName, payload);
 
     if (this.isConfigured && recipientEmail) {
       await sgMail.send({
@@ -45,12 +45,28 @@ export class NotificationsService {
     }
   }
 
+  private getRecipientEmail(
+    eventName: string,
+    payload: Record<string, unknown>,
+  ): string | undefined {
+    switch (eventName) {
+      case DomainEventName.TransferSent:
+        return payload.fromUserEmail as string | undefined;
+      case DomainEventName.TransferReceived:
+        return payload.toUserEmail as string | undefined;
+      default:
+        return payload.userEmail as string | undefined;
+    }
+  }
+
   private buildSubject(eventName: string): string {
     switch (eventName) {
       case DomainEventName.DepositSucceeded:
         return 'Deposit Received';
-      case DomainEventName.TransferCompleted:
-        return 'Transfer Completed';
+      case DomainEventName.TransferSent:
+        return 'Transfer Sent';
+      case DomainEventName.TransferReceived:
+        return 'Transfer Received';
       default:
         return `Notification: ${eventName}`;
     }
@@ -60,14 +76,20 @@ export class NotificationsService {
     eventName: string,
     payload: Record<string, unknown>,
   ): string {
-    const { amount, currency, toUserId } = payload as Record<string, string>;
+    const { amount, currency, fromUserName, toUserName } = payload as Record<
+      string,
+      string
+    >;
 
     switch (eventName) {
       case DomainEventName.DepositSucceeded:
         return `Your deposit of ${amount} ${currency} has been received.`;
 
-      case DomainEventName.TransferCompleted:
-        return `Your transfer of ${amount} ${currency} to user ${toUserId} is complete.`;
+      case DomainEventName.TransferSent:
+        return `Your transfer of ${amount} ${currency} to ${toUserName} is complete.`;
+
+      case DomainEventName.TransferReceived:
+        return `You received ${amount} ${currency} from ${fromUserName}.`;
 
       default:
         return `Notification for ${eventName}: ${JSON.stringify(payload)}`;

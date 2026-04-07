@@ -44,7 +44,7 @@ describe('DomainEventsProcessor', () => {
     );
   });
 
-  it('routes TransferCompleted to the notifications queue', async () => {
+  it('routes TransferCompleted to two notification jobs', async () => {
     const job = {
       data: {
         eventName: 'TransferCompleted',
@@ -54,10 +54,19 @@ describe('DomainEventsProcessor', () => {
 
     await processor.process(job as any);
 
+    expect(mockNotificationsQueue.add).toHaveBeenCalledTimes(2);
     expect(mockNotificationsQueue.add).toHaveBeenCalledWith(
-      'TransferCompleted',
+      'TransferSent',
       expect.objectContaining({
-        eventName: 'TransferCompleted',
+        eventName: 'TransferSent',
+        payload: { fromUserId: 'user-1', toUserId: 'user-2' },
+      }),
+    );
+    expect(mockNotificationsQueue.add).toHaveBeenCalledWith(
+      'TransferReceived',
+      expect.objectContaining({
+        eventName: 'TransferReceived',
+        payload: { fromUserId: 'user-1', toUserId: 'user-2' },
       }),
     );
   });

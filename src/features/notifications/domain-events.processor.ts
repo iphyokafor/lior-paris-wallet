@@ -19,10 +19,21 @@ export class DomainEventsProcessor extends WorkerHost {
     const { eventName, payload } = job.data;
     this.logger.log(`Processing domain event: ${eventName}`);
 
-    const notifyEvents: string[] = [
-      DomainEventName.DepositSucceeded,
-      DomainEventName.TransferCompleted,
-    ];
+    if (eventName === DomainEventName.TransferCompleted) {
+      await this.notificationsQueue.add(DomainEventName.TransferSent, {
+        eventName: DomainEventName.TransferSent,
+        payload,
+        enqueuedAt: new Date().toISOString(),
+      });
+      await this.notificationsQueue.add(DomainEventName.TransferReceived, {
+        eventName: DomainEventName.TransferReceived,
+        payload,
+        enqueuedAt: new Date().toISOString(),
+      });
+      return;
+    }
+
+    const notifyEvents: string[] = [DomainEventName.DepositSucceeded];
 
     if (notifyEvents.includes(eventName)) {
       await this.notificationsQueue.add(eventName, {
