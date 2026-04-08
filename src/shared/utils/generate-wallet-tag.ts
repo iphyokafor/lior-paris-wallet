@@ -1,6 +1,6 @@
 import { randomBytes } from 'node:crypto';
 
-export function generateWalletTag(name: string): string {
+export const generateWalletTag = (name: string): string => {
   const slug = name
     .toLowerCase()
     .replaceAll(/[^a-z0-9]+/g, '-')
@@ -10,4 +10,4 @@ export function generateWalletTag(name: string): string {
   const suffix = randomBytes(2).toString('hex');
 
   return `${slug}-${suffix}`;
-}
+};

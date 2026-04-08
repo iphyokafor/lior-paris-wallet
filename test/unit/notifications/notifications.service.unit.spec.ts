@@ -30,7 +30,7 @@ describe('NotificationsService', () => {
     });
 
     expect(logSpy).toHaveBeenCalledWith(
-      expect.stringContaining('deposit of 5000 EUR'),
+      expect.stringContaining('deposit of 50.00 EUR'),
     );
   });
 
@@ -47,7 +47,7 @@ describe('NotificationsService', () => {
     });
 
     expect(logSpy).toHaveBeenCalledWith(
-      expect.stringContaining('transfer of 3000 EUR to Bob is complete'),
+      expect.stringContaining('transfer of 30.00 EUR to Bob is complete'),
     );
   });
 
@@ -64,7 +64,7 @@ describe('NotificationsService', () => {
     });
 
     expect(logSpy).toHaveBeenCalledWith(
-      expect.stringContaining('received 3000 EUR from Alice'),
+      expect.stringContaining('received 30.00 EUR from Alice'),
     );
   });
 

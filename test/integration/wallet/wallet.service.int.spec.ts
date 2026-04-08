@@ -80,7 +80,7 @@ describe('WalletService Integration', () => {
     await mysqlDataSource.getRepository(Users).delete({});
   });
 
-  async function createUser(id: string, name: string): Promise<Users> {
+  const createUser = async (id: string, name: string): Promise<Users> => {
     const repo = mysqlDataSource.getRepository(Users);
     const user = repo.create({
       id,
@@ -89,7 +89,7 @@ describe('WalletService Integration', () => {
       password: 'hashed',
     });
     return repo.save(user);
-  }
+  };
 
   it('deposits funds and creates a ledger entry + outbox event', async () => {
     await createUser('int-user-1', 'Test User');

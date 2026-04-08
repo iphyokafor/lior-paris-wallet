@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as sgMail from '@sendgrid/mail';
 import { DomainEventName } from '../../shared/events/domain-event-name';
+import { formatCurrency } from '../../shared/utils/format-currency';
 
 @Injectable()
 export class NotificationsService {
@@ -80,16 +81,17 @@ export class NotificationsService {
       string,
       string
     >;
+    const formattedAmount = formatCurrency(amount, currency);
 
     switch (eventName) {
       case DomainEventName.DepositSucceeded:
-        return `Your deposit of ${amount} ${currency} has been received.`;
+        return `Your deposit of ${formattedAmount} has been received.`;
 
       case DomainEventName.TransferSent:
-        return `Your transfer of ${amount} ${currency} to ${toUserName} is complete.`;
+        return `Your transfer of ${formattedAmount} to ${toUserName} is complete.`;
 
       case DomainEventName.TransferReceived:
-        return `You received ${amount} ${currency} from ${fromUserName}.`;
+        return `You received ${formattedAmount} from ${fromUserName}.`;
 
       default:
         return `Notification for ${eventName}: ${JSON.stringify(payload)}`;

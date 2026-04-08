@@ -86,7 +86,7 @@ describe('TransfersService Integration', () => {
     await mysqlDataSource.getRepository(Users).delete({});
   });
 
-  async function createUser(id: string, name: string): Promise<Users> {
+  const createUser = async (id: string, name: string): Promise<Users> => {
     const repo = mysqlDataSource.getRepository(Users);
     const user = repo.create({
       id,
@@ -95,7 +95,7 @@ describe('TransfersService Integration', () => {
       password: 'hashed',
     });
     return repo.save(user);
-  }
+  };
 
   it('transfers funds between two wallets atomically', async () => {
     await createUser('sender-1', 'Sender One');
